@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB / Substrate Supply Chain Map</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f8f9fb;
+    color:#2c3e50;
+    min-height:100vh;
+    padding:32px 24px 60px;
+  }
+  h1{font-size:1.4rem;font-weight:600;color:#334155;text-align:center;margin-bottom:4px}
+  .subtitle{font-size:0.82rem;color:#94a3b8;text-align:center;margin-bottom:36px}
+  .container{max-width:1280px;margin:0 auto}
+
+  .flow-section{margin-bottom:20px}
+  .flow-label{font-size:0.72rem;font-weight:600;color:#64748b;letter-spacing:0.06em;margin-bottom:10px;padding-left:2px}
+  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:nowrap}
+  .flow-node{
+    background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;
+    padding:10px 16px;text-align:center;min-width:120px;
+    transition:box-shadow .2s;
+  }
+  .flow-node:hover{box-shadow:0 3px 10px rgba(0,0,0,0.06)}
+  .flow-node .fn-label{font-size:0.85rem;font-weight:600;color:#334155}
+  .flow-node .fn-sub{font-size:0.65rem;color:#94a3b8}
+  .flow-node.c-raw{border-left:3px solid #93c5fd}
+  .flow-node.c-mid{border-left:3px solid #86efac}
+  .flow-node.c-sub{border-left:3px solid #c4b5fd}
+  .flow-node.c-pcb{border-left:3px solid #fcd34d}
+  .flow-node.c-glass{border-left:3px solid #67e8f9}
+  .arrow{padding:0 4px;flex-shrink:0}
+  .arrow svg{width:28px;height:16px}
+  .arrow-line{stroke:#cbd5e1;stroke-width:2}
+  .arrow-head{fill:#cbd5e1}
+
+  .flow-divider{border:none;border-top:1px dashed #e2e8f0;margin:16px 0;position:relative}
+
+  .asm-note{
+    background:#fff;border:1.5px solid #e2e8f0;border-left:3px solid #f9a8d4;
+    border-radius:8px;padding:12px 18px;font-size:0.78rem;color:#64748b;
+    line-height:1.6;margin-bottom:32px;
+  }
+  .asm-note strong{color:#334155}
+
+  .panels{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-bottom:32px;
+  }
+  @media(max-width:900px){.panels{grid-template-columns:1fr}}
+
+  .panel{
+    background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
+    overflow:hidden;transition:box-shadow .2s;
+  }
+  .panel:hover{box-shadow:0 4px 14px rgba(0,0,0,0.05)}
+  .panel.bg-raw{background:#f0f7ff}
+  .panel.bg-mid{background:#f0fdf4}
+  .panel.bg-sub{background:#f5f3ff}
+  .panel.bg-pcb{background:#fffbeb}
+  .panel.bg-glass{background:#ecfeff}
+  .panel-header{
+    padding:14px 18px 10px;display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid #f1f5f9;
+  }
+  .panel-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+  .panel-title{font-size:0.92rem;font-weight:600;color:#334155}
+  .panel-sub{font-size:0.7rem;color:#94a3b8;margin-left:auto}
+
+  .panel table{width:100%;border-collapse:collapse;font-size:0.75rem}
+  .panel thead th{
+    text-align:left;padding:8px 12px;color:#94a3b8;font-weight:500;
+    font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;
+    border-bottom:1px solid #f1f5f9;background:#fafbfc;
+  }
+  .panel thead th:nth-child(3),
+  .panel thead th:nth-child(4){text-align:right}
+  .panel tbody td{
+    padding:7px 12px;border-bottom:1px solid #f8f9fb;color:#475569;
+  }
+  .panel tbody td:nth-child(3),
+  .panel tbody td:nth-child(4){text-align:right;font-variant-numeric:tabular-nums}
+  .panel tbody tr:hover{background:#f8fafc}
+  .panel tbody tr:last-child td{border-bottom:none}
+  .ticker{color:#94a3b8;font-size:0.68rem}
+  .na{color:#cbd5e1}
+
+  .glass-section{margin-bottom:32px}
+  .glass-section .flow-label{margin-bottom:12px}
+  .glass-panels{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
+  }
+  @media(max-width:900px){.glass-panels{grid-template-columns:1fr}}
+
+  .legend{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:24px}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#64748b}
+  .legend-dot{width:9px;height:9px;border-radius:3px}
+
+  .data-note{text-align:center;font-size:0.68rem;color:#b0b8c4;margin-top:16px}
+  .lang-switch{text-align:center;margin-bottom:20px}
+  .lang-switch a{font-size:0.78rem;color:#64748b;text-decoration:none;border:1px solid #e2e8f0;border-radius:6px;padding:4px 12px}
+  .lang-switch a:hover{background:#f1f5f9}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="lang-switch"><a href="index-zh.html">中文版</a></div>
+
+<h1>PCB / Substrate Supply Chain Map</h1>
+<p class="subtitle">From Raw Materials to System Assembly · Data as of 2026.02.24</p>
+
+<!-- ======== FLOW DIAGRAM ======== -->
+<div class="flow-section">
+  <div class="flow-label">PATH 1 · TRADITIONAL ORGANIC SUBSTRATE</div>
+  <div class="flow-row">
+    <div class="flow-node c-raw"><div class="fn-label">T-glass</div><div class="fn-sub">Glass Fiber Cloth</div></div>
+    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
+    <div class="flow-node c-mid"><div class="fn-label">CCL</div><div class="fn-sub">Copper Clad Laminate</div></div>
+    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
+    <div class="flow-node c-sub"><div class="fn-label">Substrate</div><div class="fn-sub">IC Substrate</div></div>
+    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
+    <div class="flow-node c-pcb"><div class="fn-label">PCB</div><div class="fn-sub">Printed Circuit Board</div></div>
+  </div>
+  <hr class="flow-divider">
+  <div class="flow-label">PATH 2 · GLASS CORE SUBSTRATE</div>
+  <div class="flow-row">
+    <div class="flow-node c-glass"><div class="fn-label">T-glass</div><div class="fn-sub">Thin Glass (TGV)</div></div>
+    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
+    <div class="flow-node c-glass"><div class="fn-label">Glass Substrate</div><div class="fn-sub">Alternative to Organic Substrate</div></div>
+  </div>
+</div>
+
+<div class="asm-note">
+  <strong>Assembly:</strong> Chip → Substrate → PCB → System &nbsp;|&nbsp;
+  <span style="color:#94a3b8">CCL also feeds PCB directly · Glass substrate bypasses CCL</span>
+</div>
+
+<!-- ======== COMPANY PANELS ======== -->
+<div class="panels">
+
+  <!-- T-GLASS -->
+  <div class="panel bg-raw">
+    <div class="panel-header">
+      <span class="panel-dot" style="background:#93c5fd"></span>
+      <span class="panel-title">T-Glass</span>
+      <span class="panel-sub">Glass Fiber Cloth</span>
+    </div>
+    <table>
+      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+      <tbody>
+        <tr><td>Grace Fabric (宏和科技)</td><td class="ticker">603256.SS</td><td>10,066</td><td class="na">N/A</td></tr>
+        <tr><td>Nittobo (日東紡)</td><td class="ticker">3110.T</td><td>6,126</td><td>39.9x</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CCL -->
+  <div class="panel bg-mid">
+    <div class="panel-header">
+      <span class="panel-dot" style="background:#86efac"></span>
+      <span class="panel-title">CCL</span>
+      <span class="panel-sub">Copper Clad Laminate</span>
+    </div>
+    <table>
+      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+      <tbody>
+        <tr><td>EMC (联茂)</td><td class="ticker">2383.TW</td><td>26,342</td><td>42.1x</td></tr>
+        <tr><td>Shengyi Tech (生益科技)</td><td class="ticker">600183.SS</td><td>23,868</td><td>34.2x</td></tr>
+        <tr><td>Resonac</td><td class="ticker">4004.T</td><td>13,830</td><td>25.7x</td></tr>
+        <tr><td>Kingboard Laminates (建滔积层板)</td><td class="ticker">1888.HK</td><td>9,178</td><td>32.0x</td></tr>
+        <tr><td>Kingboard Holdings (建滔集团)</td><td class="ticker">0148.HK</td><td>5,596</td><td>11.7x</td></tr>
+        <tr><td>Huazheng (华正新材)</td><td class="ticker">603186.SS</td><td>1,811</td><td class="na">N/A</td></tr>
+        <tr><td>ITEQ (台光电)</td><td class="ticker">6213.TW</td><td>1,545</td><td>26.2x</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SUBSTRATE -->
+  <div class="panel bg-sub">
+    <div class="panel-header">
+      <span class="panel-dot" style="background:#c4b5fd"></span>
+      <span class="panel-title">Substrate</span>
+      <span class="panel-sub">FC-BGA / BT / IC Substrate</span>
+    </div>
+    <table>
+      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+      <tbody>
+        <tr><td>Shennan Circuits (深南电路)</td><td class="ticker">002916.SZ</td><td>25,582</td><td>38.7x</td></tr>
+        <tr><td>Samsung E-M (SEMCO)</td><td class="ticker">009150.KS</td><td>22,883</td><td>31.9x</td></tr>
+        <tr><td>Unimicron (欣兴)</td><td class="ticker">3037.TW</td><td>21,745</td><td>51.0x</td></tr>
+        <tr><td>Ibiden (揖斐电)</td><td class="ticker">4062.T</td><td>17,727</td><td>49.0x</td></tr>
+        <tr><td>Nan Ya PCB (南电)</td><td class="ticker">8046.TW</td><td>10,367</td><td>57.3x</td></tr>
+        <tr><td>Xingsen Tech (兴森科技)</td><td class="ticker">002436.SZ</td><td>6,152</td><td>65.9x</td></tr>
+        <tr><td>Kinsus (景硕)</td><td class="ticker">3189.TW</td><td>4,677</td><td>51.0x</td></tr>
+        <tr><td>AT&S</td><td class="ticker">ATS.VI</td><td>2,528</td><td class="na">N/A</td></tr>
+        <tr><td>Daeduck (대덕)</td><td class="ticker">353200.KQ</td><td>2,257</td><td>21.5x</td></tr>
+        <tr><td>Simmtech (심텍)</td><td class="ticker">222800.KQ</td><td>1,385</td><td>15.8x</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PCB -->
+  <div class="panel bg-pcb">
+    <div class="panel-header">
+      <span class="panel-dot" style="background:#fcd34d"></span>
+      <span class="panel-title">PCB</span>
+      <span class="panel-sub">Printed Circuit Board</span>
+    </div>
+    <table>
+      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+      <tbody>
+        <tr><td>Shenghong Tech (胜宏科技)</td><td class="ticker">300476.SZ</td><td>33,576</td><td>33.1x</td></tr>
+        <tr><td>Dongshan Precision (东山精密)</td><td class="ticker">002384.SZ</td><td>20,897</td><td>36.4x</td></tr>
+        <tr><td>Gold Circuit (金像电子)</td><td class="ticker">2368.TW</td><td>12,931</td><td>29.9x</td></tr>
+        <tr><td>TTM Technologies</td><td class="ticker">TTMI</td><td>11,033</td><td>33.2x</td></tr>
+        <tr><td>Compeq (华通)</td><td class="ticker">2313.TW</td><td>8,572</td><td>35.4x</td></tr>
+        <tr><td>Zhen Ding (鹏鼎)</td><td class="ticker">4958.TW</td><td>7,017</td><td>18.9x</td></tr>
+        <tr><td>Tripod (健鼎)</td><td class="ticker">3044.TW</td><td>6,572</td><td>16.9x</td></tr>
+        <tr><td>NOK / Mektron</td><td class="ticker">7240.T</td><td>3,373</td><td>15.8x</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ======== GLASS PATH PANELS ======== -->
+<div class="glass-section">
+  <div class="flow-label">PATH 2 · GLASS SUBSTRATE COMPANIES</div>
+  <div class="glass-panels">
+
+    <div class="panel bg-glass">
+      <div class="panel-header">
+        <span class="panel-dot" style="background:#67e8f9"></span>
+        <span class="panel-title">T-Glass (Thin)</span>
+        <span class="panel-sub">TGV Glass Material</span>
+      </div>
+      <table>
+        <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+        <tbody>
+          <tr><td>AGC Inc.</td><td class="ticker">5201.T</td><td>8,889</td><td>16.4x</td></tr>
+          <tr><td>Nippon Electric Glass</td><td class="ticker">5214.T</td><td>3,106</td><td>19.0x</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel bg-glass">
+      <div class="panel-header">
+        <span class="panel-dot" style="background:#67e8f9"></span>
+        <span class="panel-title">Glass Substrate</span>
+        <span class="panel-sub">Glass Core Substrate</span>
+      </div>
+      <table>
+        <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
+        <tbody>
+          <tr><td>SKC / Absolics</td><td class="ticker">011790.KS</td><td>2,673</td><td class="na">N/A</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======== LEGEND ======== -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#93c5fd"></span>Raw Material</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#86efac"></span>Intermediate</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#c4b5fd"></span>Substrate</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#fcd34d"></span>PCB</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#67e8f9"></span>Glass Path</div>
+</div>
+<div class="data-note">
+  Market cap & Forward P/E as of 2026.02.24 · Low-exposure conglomerates excluded (Nan Ya Plastics, China Jushi, Asahi Kasei, Panasonic, Ajinomoto, Doosan, LG Innotek, Corning, DNP, etc.)
+</div>
+
+</div>
+</body>
+</html>
