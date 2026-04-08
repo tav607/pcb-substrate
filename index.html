@@ -1,280 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PCB / Substrate Supply Chain Map</title>
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:#f8f9fb;
-    color:#2c3e50;
-    min-height:100vh;
-    padding:32px 24px 60px;
-  }
-  h1{font-size:1.4rem;font-weight:600;color:#334155;text-align:center;margin-bottom:4px}
-  .subtitle{font-size:0.82rem;color:#94a3b8;text-align:center;margin-bottom:36px}
-  .container{max-width:1280px;margin:0 auto}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB / Substrate Value Chain</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8f9fc;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: rgba(255, 255, 255, 1);
+            --border-subtle: rgba(0, 0, 0, 0.08);
 
-  .flow-section{margin-bottom:20px}
-  .flow-label{font-size:0.72rem;font-weight:600;color:#64748b;letter-spacing:0.06em;margin-bottom:10px;padding-left:2px}
-  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:nowrap}
-  .flow-node{
-    background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;
-    padding:10px 16px;text-align:center;min-width:120px;
-    transition:box-shadow .2s;
-  }
-  .flow-node:hover{box-shadow:0 3px 10px rgba(0,0,0,0.06)}
-  .flow-node .fn-label{font-size:0.85rem;font-weight:600;color:#334155}
-  .flow-node .fn-sub{font-size:0.65rem;color:#94a3b8}
-  .flow-node.c-raw{border-left:3px solid #93c5fd}
-  .flow-node.c-mid{border-left:3px solid #86efac}
-  .flow-node.c-sub{border-left:3px solid #c4b5fd}
-  .flow-node.c-pcb{border-left:3px solid #fcd34d}
-  .flow-node.c-glass{border-left:3px solid #67e8f9}
-  .arrow{padding:0 4px;flex-shrink:0}
-  .arrow svg{width:28px;height:16px}
-  .arrow-line{stroke:#cbd5e1;stroke-width:2}
-  .arrow-head{fill:#cbd5e1}
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --text-muted: #7a7a8a;
 
-  .flow-divider{border:none;border-top:1px dashed #e2e8f0;margin:16px 0;position:relative}
+            --accent-blue: #0078b4;
+            --accent-purple: #7c3aed;
+            --accent-orange: #e85a24;
+            --accent-green: #059669;
 
-  .asm-note{
-    background:#fff;border:1.5px solid #e2e8f0;border-left:3px solid #f9a8d4;
-    border-radius:8px;padding:12px 18px;font-size:0.78rem;color:#64748b;
-    line-height:1.6;margin-bottom:32px;
-  }
-  .asm-note strong{color:#334155}
+            --glow-blue: 0 4px 20px rgba(0, 120, 180, 0.15);
 
-  .panels{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:20px;
-    margin-bottom:32px;
-  }
-  @media(max-width:900px){.panels{grid-template-columns:1fr}}
+            --font-mono: 'IBM Plex Mono', monospace;
+            --font-sans: 'Inter', -apple-system, sans-serif;
 
-  .panel{
-    background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;
-    overflow:hidden;transition:box-shadow .2s;
-  }
-  .panel:hover{box-shadow:0 4px 14px rgba(0,0,0,0.05)}
-  .panel.bg-raw{background:#f0f7ff}
-  .panel.bg-mid{background:#f0fdf4}
-  .panel.bg-sub{background:#f5f3ff}
-  .panel.bg-pcb{background:#fffbeb}
-  .panel.bg-glass{background:#ecfeff}
-  .panel-header{
-    padding:14px 18px 10px;display:flex;align-items:center;gap:10px;
-    border-bottom:1px solid #f1f5f9;
-  }
-  .panel-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-  .panel-title{font-size:0.92rem;font-weight:600;color:#334155}
-  .panel-sub{font-size:0.7rem;color:#94a3b8;margin-left:auto}
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+        }
 
-  .panel table{width:100%;border-collapse:collapse;font-size:0.75rem}
-  .panel thead th{
-    text-align:left;padding:8px 12px;color:#94a3b8;font-weight:500;
-    font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;
-    border-bottom:1px solid #f1f5f9;background:#fafbfc;
-  }
-  .panel thead th:nth-child(3),
-  .panel thead th:nth-child(4){text-align:right}
-  .panel tbody td{
-    padding:7px 12px;border-bottom:1px solid #f8f9fb;color:#475569;
-  }
-  .panel tbody td:nth-child(3),
-  .panel tbody td:nth-child(4){text-align:right;font-variant-numeric:tabular-nums}
-  .panel tbody tr:hover{background:#f8fafc}
-  .panel tbody tr:last-child td{border-bottom:none}
-  .ticker{color:#94a3b8;font-size:0.68rem}
-  .na{color:#cbd5e1}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  .glass-section{margin-bottom:32px}
-  .glass-section .flow-label{margin-bottom:12px}
-  .glass-panels{
-    display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
-  }
-  @media(max-width:900px){.glass-panels{grid-template-columns:1fr}}
+        html {
+            scroll-behavior: smooth;
+        }
 
-  .legend{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:24px}
-  .legend-item{display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#64748b}
-  .legend-dot{width:9px;height:9px;border-radius:3px}
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-  .data-note{text-align:center;font-size:0.68rem;color:#b0b8c4;margin-top:16px}
+        /* Background Effects */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(0, 120, 180, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 120, 180, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-</style>
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0, 120, 180, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 3rem 0 2rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-blue);
+        }
+
+        .logo-text h1 {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Section Titles */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title h2 {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .section-title .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-subtle), transparent);
+        }
+
+        .section-title .badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 120, 180, 0.1);
+            border: 1px solid rgba(0, 120, 180, 0.2);
+            border-radius: 20px;
+            color: var(--accent-blue);
+        }
+
+        /* Value Chain Section */
+        .value-chain-section {
+            margin-bottom: 4rem;
+        }
+
+        .value-chain-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 2rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .value-chain {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* Each stage = full-width horizontal band */
+        .chain-stage {
+            width: 100%;
+        }
+
+        .chain-stage-header {
+            text-align: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        .chain-stage-header::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 240px;
+            max-width: 60%;
+            height: 2px;
+            background: var(--stage-color, var(--accent-blue));
+            border-radius: 2px;
+        }
+
+        .chain-stage-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 0.75rem;
+            background: linear-gradient(135deg, var(--stage-color, var(--accent-blue)), transparent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .chain-stage-title {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .chain-stage-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .chain-companies {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        /* Force max columns per row by capping container width */
+        .chain-companies.cols-2 {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .chain-companies.cols-3 {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        .chain-company {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--company-color, var(--accent-blue));
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            flex: 1 1 280px;
+            min-width: 260px;
+            max-width: 360px;
+        }
+
+        .chain-company:hover {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: var(--company-color, var(--accent-blue));
+            border-left-color: var(--company-color, var(--accent-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Connector arrow between stages (vertical flow indicator) */
+        .chain-arrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.85rem 0;
+            color: var(--text-muted);
+            opacity: 0.55;
+        }
+
+        .chain-arrow svg {
+            width: 22px;
+            height: 32px;
+        }
+
+        .chain-company-header {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .chain-company-ticker {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--company-color, var(--accent-blue));
+        }
+
+        .chain-company-name {
+            font-family: var(--font-sans);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .chain-company-products {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
+
 <body>
+    <div class="bg-grid"></div>
+    <div class="bg-gradient"></div>
 
-<div class="container">
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">⚡</div>
+                    <div class="logo-text">
+                        <h1>PCB / Substrate Value Chain</h1>
+                        <p>Cu Foil → CCL → IC Substrate → PCB Mainboard // 2026.04</p>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-<h1>PCB / Substrate Supply Chain Map</h1>
-<p class="subtitle">From Raw Materials to System Assembly · Data as of 2026.02.24</p>
+        <!-- Value Chain -->
+        <section class="value-chain-section">
+            <div class="section-title">
+                <h2>PCB / Substrate Value Chain</h2>
+                <span class="line"></span>
+                <span class="badge">Hover for details</span>
+            </div>
+            <div class="value-chain-container">
+                <div class="value-chain">
 
-<!-- ======== FLOW DIAGRAM ======== -->
-<div class="flow-section">
-  <div class="flow-label">PATH 1 · TRADITIONAL ORGANIC SUBSTRATE</div>
-  <div class="flow-row">
-    <div class="flow-node c-raw"><div class="fn-label">T-glass</div><div class="fn-sub">Glass Fiber Cloth</div></div>
-    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
-    <div class="flow-node c-mid"><div class="fn-label">CCL</div><div class="fn-sub">Copper Clad Laminate</div></div>
-    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
-    <div class="flow-node c-sub"><div class="fn-label">Substrate</div><div class="fn-sub">IC Substrate</div></div>
-    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
-    <div class="flow-node c-pcb"><div class="fn-label">PCB</div><div class="fn-sub">Printed Circuit Board</div></div>
-  </div>
-  <hr class="flow-divider">
-  <div class="flow-label">PATH 2 · GLASS CORE SUBSTRATE</div>
-  <div class="flow-row">
-    <div class="flow-node c-glass"><div class="fn-label">T-glass</div><div class="fn-sub">Thin Glass (TGV)</div></div>
-    <div class="arrow"><svg viewBox="0 0 28 16"><line x1="0" y1="8" x2="20" y2="8" class="arrow-line"/><polygon points="20,4 28,8 20,12" class="arrow-head"/></svg></div>
-    <div class="flow-node c-glass"><div class="fn-label">Glass Substrate</div><div class="fn-sub">Alternative to Organic Substrate</div></div>
-  </div>
-</div>
+                    <!-- Stage 1: Upstream Cu Foil -->
+                        <div class="chain-stage" style="--stage-color: #a855f7">
+                            <div class="chain-stage-header">
+                                <div class="chain-stage-icon">◆</div>
+                                <div class="chain-stage-title">Upstream: Copper Foil</div>
+                                <div class="chain-stage-subtitle">Electrolytic / Rolled / HVLP Cu foil</div>
+                            </div>
+                            <div class="chain-companies cols-2">
+                                <div class="chain-company" style="--company-color: #c2410c">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">5016.T</span>
+                                        <span class="chain-company-name">JX Advanced Metals</span>
+                                    </div>
+                                    <div class="chain-company-products">Long-time PCB Cu foil major (electrolytic & rolled), incl. HVLP high-speed grades</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #b45309">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">5706.T</span>
+                                        <span class="chain-company-name">Mitsui Kinzoku</span>
+                                    </div>
+                                    <div class="chain-company-products">MicroThin / HVLP ultra-thin Cu foil — core material for advanced HDI & FC-BGA substrate</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #f97316">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">5801.T</span>
+                                        <span class="chain-company-name">Furukawa Electric</span>
+                                    </div>
+                                    <div class="chain-company-products">Japanese Tier-1 Cu foil supplier — HVLP high-speed & PCB-grade copper foil</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #d97706">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">020150.KS</span>
+                                        <span class="chain-company-name">Lotte Energy Materials</span>
+                                    </div>
+                                    <div class="chain-company-products">Korean Cu foil champion — first to mass-produce HVLP Grade 4 for AI accelerators</div>
+                                </div>
+                            </div>
+                        </div>
 
-<div class="asm-note">
-  <strong>Assembly:</strong> Chip → Substrate → PCB → System &nbsp;|&nbsp;
-  <span style="color:#94a3b8">CCL also feeds PCB directly · Glass substrate bypasses CCL</span>
-</div>
+                    <div class="chain-arrow">
+                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="11" y1="4" x2="11" y2="24"/>
+                            <polyline points="5,18 11,24 17,18"/>
+                        </svg>
+                    </div>
 
-<!-- ======== COMPANY PANELS ======== -->
-<div class="panels">
+                        <!-- Stage 2: CCL -->
+                        <div class="chain-stage" style="--stage-color: #10b981">
+                            <div class="chain-stage-header">
+                                <div class="chain-stage-icon">●</div>
+                                <div class="chain-stage-title">CCL · Copper-Clad Laminate</div>
+                                <div class="chain-stage-subtitle">High-speed / low-loss laminate</div>
+                            </div>
+                            <div class="chain-companies cols-2">
+                                <div class="chain-company" style="--company-color: #0891b2">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">2383.TW</span>
+                                        <span class="chain-company-name">EMC (Elite Material)</span>
+                                    </div>
+                                    <div class="chain-company-products">High-speed / low-loss CCL, M6/M7 supplier for AI servers</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #16a34a">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">600183.SS</span>
+                                        <span class="chain-company-name">Shengyi Tech</span>
+                                    </div>
+                                    <div class="chain-company-products">M6/M7/M8 high-speed CCL, China's mass-lam leader</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #14b8a6">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">6274.TW</span>
+                                        <span class="chain-company-name">Taiwan Union Tech (TUC)</span>
+                                    </div>
+                                    <div class="chain-company-products">ThunderClad high-speed CCL series, AI server top-3 alongside EMC and Panasonic</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #22c55e">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">6213.TW</span>
+                                        <span class="chain-company-name">ITEQ</span>
+                                    </div>
+                                    <div class="chain-company-products">Taiwan high-speed CCL pure-play, material AI server share</div>
+                                </div>
+                            </div>
+                        </div>
 
-  <!-- T-GLASS -->
-  <div class="panel bg-raw">
-    <div class="panel-header">
-      <span class="panel-dot" style="background:#93c5fd"></span>
-      <span class="panel-title">T-Glass</span>
-      <span class="panel-sub">Glass Fiber Cloth</span>
+                    <div class="chain-arrow">
+                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="11" y1="4" x2="11" y2="24"/>
+                            <polyline points="5,18 11,24 17,18"/>
+                        </svg>
+                    </div>
+
+                        <!-- Stage 3: IC Substrate -->
+                        <div class="chain-stage" style="--stage-color: #00d4ff">
+                            <div class="chain-stage-header">
+                                <div class="chain-stage-icon">■</div>
+                                <div class="chain-stage-title">IC Substrate</div>
+                                <div class="chain-stage-subtitle">FC-BGA / BT package substrate</div>
+                            </div>
+                            <div class="chain-companies cols-3">
+                                <div class="chain-company" style="--company-color: #2563eb">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">3037.TW</span>
+                                        <span class="chain-company-name">Unimicron</span>
+                                    </div>
+                                    <div class="chain-company-products">Top-3 global FC-BGA substrate, AI / HPC ramp</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #6366f1">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">4062.T</span>
+                                        <span class="chain-company-name">Ibiden</span>
+                                    </div>
+                                    <div class="chain-company-products">Premium FC-BGA leader, NVIDIA primary substrate supplier</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #7c3aed">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">3189.TW</span>
+                                        <span class="chain-company-name">Kinsus</span>
+                                    </div>
+                                    <div class="chain-company-products">FC-BGA & BT substrate, mid-range AI capacity</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #1d4ed8">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">009150.KS</span>
+                                        <span class="chain-company-name">Samsung Electro-Mechanics</span>
+                                    </div>
+                                    <div class="chain-company-products">Korea's primary FC-BGA substrate maker, ramping NVIDIA AI substrate</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #4f46e5">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">8046.TW</span>
+                                        <span class="chain-company-name">Nan Ya PCB</span>
+                                    </div>
+                                    <div class="chain-company-products">Taiwan "Big Three" substrate maker (with Unimicron & Kinsus), premium FC-BGA</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="chain-arrow">
+                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="11" y1="4" x2="11" y2="24"/>
+                            <polyline points="5,18 11,24 17,18"/>
+                        </svg>
+                    </div>
+
+                        <!-- Stage 4: PCB -->
+                        <div class="chain-stage" style="--stage-color: #f59e0b">
+                            <div class="chain-stage-header">
+                                <div class="chain-stage-icon">▲</div>
+                                <div class="chain-stage-title">PCB · Mainboard</div>
+                                <div class="chain-stage-subtitle">Server / GPU mainboard</div>
+                            </div>
+                            <div class="chain-companies cols-2">
+                                <div class="chain-company" style="--company-color: #ea580c">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">300476.SZ</span>
+                                        <span class="chain-company-name">Shenghong Tech</span>
+                                    </div>
+                                    <div class="chain-company-products">High-layer-count PCB, NVIDIA GPU mainboard supplier</div>
+                                </div>
+                                <div class="chain-company" style="--company-color: #b91c1c">
+                                    <div class="chain-company-header">
+                                        <span class="chain-company-ticker">002463.SZ</span>
+                                        <span class="chain-company-name">WUS Printed Circuit (沪电股份)</span>
+                                    </div>
+                                    <div class="chain-company-products">China A-share AI server PCB core, fast HPC business ramp</div>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        </section>
     </div>
-    <table>
-      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-      <tbody>
-        <tr><td>Grace Fabric (宏和科技)</td><td class="ticker">603256.SS</td><td>10,066</td><td class="na">N/A</td></tr>
-        <tr><td>Nittobo (日東紡)</td><td class="ticker">3110.T</td><td>6,126</td><td>39.9x</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- CCL -->
-  <div class="panel bg-mid">
-    <div class="panel-header">
-      <span class="panel-dot" style="background:#86efac"></span>
-      <span class="panel-title">CCL</span>
-      <span class="panel-sub">Copper Clad Laminate</span>
-    </div>
-    <table>
-      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-      <tbody>
-        <tr><td>EMC (联茂)</td><td class="ticker">2383.TW</td><td>26,342</td><td>42.1x</td></tr>
-        <tr><td>Shengyi Tech (生益科技)</td><td class="ticker">600183.SS</td><td>23,868</td><td>34.2x</td></tr>
-        <tr><td>Resonac</td><td class="ticker">4004.T</td><td>13,830</td><td>25.7x</td></tr>
-        <tr><td>Kingboard Laminates (建滔积层板)</td><td class="ticker">1888.HK</td><td>9,178</td><td>32.0x</td></tr>
-        <tr><td>Huazheng (华正新材)</td><td class="ticker">603186.SS</td><td>1,811</td><td class="na">N/A</td></tr>
-        <tr><td>ITEQ (台光电)</td><td class="ticker">6213.TW</td><td>1,545</td><td>26.2x</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- SUBSTRATE -->
-  <div class="panel bg-sub">
-    <div class="panel-header">
-      <span class="panel-dot" style="background:#c4b5fd"></span>
-      <span class="panel-title">Substrate</span>
-      <span class="panel-sub">FC-BGA / BT / IC Substrate</span>
-    </div>
-    <table>
-      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-      <tbody>
-        <tr><td>Shennan Circuits (深南电路)</td><td class="ticker">002916.SZ</td><td>25,582</td><td>38.7x</td></tr>
-        <tr><td>Samsung E-M (SEMCO)</td><td class="ticker">009150.KS</td><td>22,883</td><td>31.9x</td></tr>
-        <tr><td>Unimicron (欣兴)</td><td class="ticker">3037.TW</td><td>21,745</td><td>51.0x</td></tr>
-        <tr><td>Ibiden (揖斐电)</td><td class="ticker">4062.T</td><td>17,727</td><td>49.0x</td></tr>
-        <tr><td>Nan Ya PCB (南电)</td><td class="ticker">8046.TW</td><td>10,367</td><td>57.3x</td></tr>
-        <tr><td>Xingsen Tech (兴森科技)</td><td class="ticker">002436.SZ</td><td>6,152</td><td>65.9x</td></tr>
-        <tr><td>Kinsus (景硕)</td><td class="ticker">3189.TW</td><td>4,677</td><td>51.0x</td></tr>
-        <tr><td>AT&S</td><td class="ticker">ATS.VI</td><td>2,528</td><td class="na">N/A</td></tr>
-        <tr><td>Daeduck (대덕)</td><td class="ticker">353200.KQ</td><td>2,257</td><td>21.5x</td></tr>
-        <tr><td>Simmtech (심텍)</td><td class="ticker">222800.KQ</td><td>1,385</td><td>15.8x</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- PCB -->
-  <div class="panel bg-pcb">
-    <div class="panel-header">
-      <span class="panel-dot" style="background:#fcd34d"></span>
-      <span class="panel-title">PCB</span>
-      <span class="panel-sub">Printed Circuit Board</span>
-    </div>
-    <table>
-      <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-      <tbody>
-        <tr><td>Shenghong Tech (胜宏科技)</td><td class="ticker">300476.SZ</td><td>33,576</td><td>33.1x</td></tr>
-        <tr><td>Dongshan Precision (东山精密)</td><td class="ticker">002384.SZ</td><td>20,897</td><td>36.4x</td></tr>
-        <tr><td>Gold Circuit (金像电子)</td><td class="ticker">2368.TW</td><td>12,931</td><td>29.9x</td></tr>
-        <tr><td>TTM Technologies</td><td class="ticker">TTMI</td><td>11,033</td><td>33.2x</td></tr>
-        <tr><td>Compeq (华通)</td><td class="ticker">2313.TW</td><td>8,572</td><td>35.4x</td></tr>
-        <tr><td>Zhen Ding (鹏鼎)</td><td class="ticker">4958.TW</td><td>7,017</td><td>18.9x</td></tr>
-        <tr><td>Tripod (健鼎)</td><td class="ticker">3044.TW</td><td>6,572</td><td>16.9x</td></tr>
-        <tr><td>NOK / Mektron</td><td class="ticker">7240.T</td><td>3,373</td><td>15.8x</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-</div>
-
-<!-- ======== GLASS PATH PANELS ======== -->
-<div class="glass-section">
-  <div class="flow-label">PATH 2 · GLASS SUBSTRATE COMPANIES</div>
-  <div class="glass-panels">
-
-    <div class="panel bg-glass">
-      <div class="panel-header">
-        <span class="panel-dot" style="background:#67e8f9"></span>
-        <span class="panel-title">T-Glass (Thin)</span>
-        <span class="panel-sub">TGV Glass Material</span>
-      </div>
-      <table>
-        <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-        <tbody>
-          <tr><td>AGC Inc.</td><td class="ticker">5201.T</td><td>8,889</td><td>16.4x</td></tr>
-          <tr><td>Nippon Electric Glass</td><td class="ticker">5214.T</td><td>3,106</td><td>19.0x</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="panel bg-glass">
-      <div class="panel-header">
-        <span class="panel-dot" style="background:#67e8f9"></span>
-        <span class="panel-title">Glass Substrate</span>
-        <span class="panel-sub">Glass Core Substrate</span>
-      </div>
-      <table>
-        <thead><tr><th>Company</th><th>Ticker</th><th>Mkt Cap ($mn)</th><th>Fwd P/E</th></tr></thead>
-        <tbody>
-          <tr><td>SKC / Absolics</td><td class="ticker">011790.KS</td><td>2,673</td><td class="na">N/A</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-</div>
-
-<!-- ======== LEGEND ======== -->
-<div class="legend">
-  <div class="legend-item"><span class="legend-dot" style="background:#93c5fd"></span>Raw Material</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#86efac"></span>Intermediate</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#c4b5fd"></span>Substrate</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#fcd34d"></span>PCB</div>
-  <div class="legend-item"><span class="legend-dot" style="background:#67e8f9"></span>Glass Path</div>
-</div>
-<div class="data-note">
-  Market cap & Forward P/E as of 2026.02.24 · Low-exposure conglomerates excluded (Nan Ya Plastics, China Jushi, Asahi Kasei, Panasonic, Ajinomoto, Doosan, LG Innotek, Corning, DNP, etc.)
-</div>
-
-</div>
 </body>
+
 </html>
