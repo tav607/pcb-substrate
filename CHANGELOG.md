@@ -4,6 +4,65 @@ PCB / Substrate value chain visualization. Files: `index.html` (EN) and `index-z
 
 ---
 
+## 2026-04-09 — Bifurcate value chain (Substrate vs PCB are parallel, not sequential)
+
+Restructured both `index.html` and `index-zh.html` from a 4-stage **linear flow** (Cu Foil → CCL → IC Substrate → PCB) into a **bifurcated flow**: a common `Cu Foil` upstream that splits into two parallel paths.
+
+### Topology change
+
+```
+Before (linear, wrong):
+    Cu Foil → CCL → IC Substrate → PCB
+
+After (bifurcated, correct):
+    Cu Foil ─┬─→ ABF / Substrate Material ─→ IC Substrate
+             └─→ CCL ────────────────────── → PCB Mainboard
+```
+
+**Why it was wrong**: IC Substrate does not consume CCL or feed PCB — they are parallel end-products that converge only at module assembly (substrate-mounted die soldered to PCB mainboard). The previous diagram implied CCL was a substrate input and IC Substrate was a PCB input, both false.
+
+**Why CCL is on the PCB side only**: in the AI-server context, the high-speed CCL makers in this chart (EMC, Shengyi, TUC, ITEQ) supply PCB mainboards, not FC-BGA substrate. FC-BGA build-up layers use **ABF film** (electroplated Cu on dielectric), not Cu-foil-laminated CCL. Only the thin core layer of FC-BGA uses a CCL-type material, which is a small portion of the substrate stack.
+
+### New stage: ABF / Substrate Material (pink `#ec4899`)
+
+A new "Stage 2L" inserted between Cu Foil and IC Substrate, holding the substrate dielectric material suppliers:
+
+| Ticker | Company | Role |
+|---|---|---|
+| 2802.T | **Ajinomoto** | ABF Build-up Film — >95% global share monopoly for FC-BGA build-up dielectric (every NVIDIA / AMD AI package uses it) |
+| 4182.T | **Mitsubishi Gas Chemical** | BT resin (Bismaleimide Triazine) — dominant dielectric for BT substrate (memory / mobile SoC packaging) |
+
+**Reverses earlier exclusion** — the 2026-04-08 entry listed Ajinomoto under "Other previously-excluded names (low-exposure conglomerate rule)". User reconsidered this for substrate materials specifically because Ajinomoto's ABF monopoly is the single most important bottleneck in the AI-substrate supply chain — too important to omit even though Electronic Materials is a small share of Ajinomoto's revenue.
+
+### Card count by stage (after change)
+
+| # | Stage | Stage color | Cards | Path |
+|---|---|---|---|---|
+| 1 | ◆ Upstream Cu Foil | purple `#a855f7` | 4 | shared (top) |
+| 2L | ◇ ABF / Substrate Material | pink `#ec4899` | 2 | substrate path |
+| 2R | ● CCL · 覆铜板 | emerald `#10b981` | 4 | PCB path |
+| 3L | ■ IC Substrate · FC-BGA / BT | cyan `#00d4ff` | 5 | substrate path |
+| 3R | ▲ PCB · 主板 | amber `#f59e0b` | 2 | PCB path |
+
+**17 listed companies total** (was 15; +Ajinomoto, +Mitsubishi Gas Chemical).
+
+### Layout / CSS additions
+
+- **`.chain-branch`** — CSS grid `grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start`. Holds two `.chain-branch-column` (Substrate path / PCB path) side-by-side. Each column is a vertical sub-flow with its own `.chain-stage` blocks and `.chain-arrow` connectors.
+- **`.chain-arrow-split`** — Y-shaped CSS-only connector between Cu Foil and the branch grid. Built from 4 absolutely-positioned `<span>`s (no SVG): `.trunk` (vertical line at 50%), `.bridge` (horizontal line from 25% to 75%), `.branch.left` / `.branch.right` (vertical lines at 25% / 75%, each with a `::after` pseudo-element rendering a CSS-triangle arrowhead). Uses `currentColor` + `opacity: 0.55` to match the existing `.chain-arrow` aesthetic.
+- **Mobile fallback** (`@media max-width: 900px`): `.chain-branch` collapses to single column; `.chain-arrow-split .bridge` and `.branch.right` are hidden so the Y degenerates into a centered single arrow.
+- **IC Substrate cards**: switched from `cols-3` (3 per row, max-width 1140px) to `cols-2` (2 per row, max-width 760px) because the column is now half-width. 5 cards now wrap as 2 + 2 + 1 instead of 3 + 2.
+- **Header subtitle**: updated to `Cu Foil → ⟨ ABF → IC Substrate ‖ CCL → PCB Mainboard ⟩` (EN) / `铜箔 → ⟨ ABF → IC 载板 ‖ CCL → PCB 主板 ⟩` (ZH) to communicate the parallel-paths topology in a single line.
+- **`cols-3` CSS class** — left in place even though no element references it now. Cheap to keep, may be useful if a future stage needs 3-card rows.
+
+### Files touched
+
+- `index.html` — English version
+- `index-zh.html` — Chinese version
+- `CHANGELOG.md` — this entry
+
+---
+
 ## 2026-04-08 — Value chain rebuild (optics-basket format)
 
 Rewrote both `index.html` and `index-zh.html` from a "supply chain map" (small flow diagram + 2×2 panel grid with mkt cap / P/E tables) into a focused **linear value chain visualization** in the same visual style as `../optics-basket/optics-basket-viz.html`.

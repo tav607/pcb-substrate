@@ -296,6 +296,93 @@
             height: 32px;
         }
 
+        /* Branch container — Cu Foil splits into Substrate path & PCB path */
+        .chain-branch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .chain-branch-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Y-split arrow visual after Cu Foil */
+        .chain-arrow-split {
+            position: relative;
+            height: 56px;
+            margin: 0.5rem 0 0.25rem;
+            color: var(--text-muted);
+            opacity: 0.55;
+        }
+
+        .chain-arrow-split .trunk {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 14px;
+            background: currentColor;
+            transform: translateX(-50%);
+            border-radius: 1px;
+        }
+
+        .chain-arrow-split .bridge {
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            top: 14px;
+            height: 2px;
+            background: currentColor;
+            border-radius: 1px;
+        }
+
+        .chain-arrow-split .branch {
+            position: absolute;
+            top: 14px;
+            width: 2px;
+            height: 30px;
+            background: currentColor;
+            transform: translateX(-50%);
+            border-radius: 1px;
+        }
+
+        .chain-arrow-split .branch.left { left: 25%; }
+        .chain-arrow-split .branch.right { left: 75%; }
+
+        .chain-arrow-split .branch::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -7px;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid currentColor;
+        }
+
+        @media (max-width: 900px) {
+            .chain-branch {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .chain-arrow-split {
+                height: 32px;
+            }
+            .chain-arrow-split .bridge,
+            .chain-arrow-split .branch.right {
+                display: none;
+            }
+            .chain-arrow-split .branch.left {
+                left: 50%;
+                height: 18px;
+            }
+        }
+
         .chain-company-header {
             display: flex;
             align-items: baseline;
@@ -369,7 +456,7 @@
                     <div class="logo-icon">⚡</div>
                     <div class="logo-text">
                         <h1>PCB / 载板 价值链</h1>
-                        <p>上游铜箔 → CCL → IC载板 → PCB主板 // 2026.04</p>
+                        <p>铜箔 → ⟨ ABF → IC 载板 ‖ CCL → PCB 主板 ⟩ // 2026.04</p>
                     </div>
                 </div>
             </div>
@@ -385,175 +472,216 @@
             <div class="value-chain-container">
                 <div class="value-chain">
 
-                    <!-- Stage 1: Upstream Cu Foil -->
-                        <div class="chain-stage" style="--stage-color: #a855f7">
-                            <div class="chain-stage-header">
-                                <div class="chain-stage-icon">◆</div>
-                                <div class="chain-stage-title">上游：铜箔材料</div>
-                                <div class="chain-stage-subtitle">电解 / 压延 / HVLP 铜箔</div>
+                    <!-- Stage 1: Upstream Cu Foil (两条路径共同上游) -->
+                    <div class="chain-stage" style="--stage-color: #a855f7">
+                        <div class="chain-stage-header">
+                            <div class="chain-stage-icon">◆</div>
+                            <div class="chain-stage-title">上游：铜箔材料</div>
+                            <div class="chain-stage-subtitle">电解 / 压延 / HVLP 铜箔 · 共同原材料</div>
+                        </div>
+                        <div class="chain-companies cols-2">
+                            <div class="chain-company" style="--company-color: #c2410c">
+                                <div class="chain-company-header">
+                                    <span class="chain-company-ticker">5016.T</span>
+                                    <span class="chain-company-name">JX Advanced Metals</span>
+                                </div>
+                                <div class="chain-company-products">PCB 用电解与压延铜箔老牌大厂，含 HVLP 高速等级</div>
                             </div>
-                            <div class="chain-companies cols-2">
-                                <div class="chain-company" style="--company-color: #c2410c">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">5016.T</span>
-                                        <span class="chain-company-name">JX Advanced Metals</span>
-                                    </div>
-                                    <div class="chain-company-products">PCB 用电解与压延铜箔老牌大厂，含 HVLP 高速等级</div>
+                            <div class="chain-company" style="--company-color: #b45309">
+                                <div class="chain-company-header">
+                                    <span class="chain-company-ticker">5706.T</span>
+                                    <span class="chain-company-name">Mitsui Kinzoku 三井金属</span>
                                 </div>
-                                <div class="chain-company" style="--company-color: #b45309">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">5706.T</span>
-                                        <span class="chain-company-name">Mitsui Kinzoku 三井金属</span>
-                                    </div>
-                                    <div class="chain-company-products">MicroThin / HVLP 超薄铜箔，高端 HDI 与 FC-BGA 载板核心材料</div>
+                                <div class="chain-company-products">MicroThin / HVLP 超薄铜箔，高端 HDI 与 FC-BGA 载板核心材料</div>
+                            </div>
+                            <div class="chain-company" style="--company-color: #f97316">
+                                <div class="chain-company-header">
+                                    <span class="chain-company-ticker">5801.T</span>
+                                    <span class="chain-company-name">Furukawa Electric 古河电工</span>
                                 </div>
-                                <div class="chain-company" style="--company-color: #f97316">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">5801.T</span>
-                                        <span class="chain-company-name">Furukawa Electric 古河电工</span>
-                                    </div>
-                                    <div class="chain-company-products">日系铜箔 Tier-1，HVLP 高速铜箔与 PCB 用铜箔核心供应商</div>
+                                <div class="chain-company-products">日系铜箔 Tier-1，HVLP 高速铜箔与 PCB 用铜箔核心供应商</div>
+                            </div>
+                            <div class="chain-company" style="--company-color: #d97706">
+                                <div class="chain-company-header">
+                                    <span class="chain-company-ticker">020150.KS</span>
+                                    <span class="chain-company-name">Lotte Energy Materials</span>
                                 </div>
-                                <div class="chain-company" style="--company-color: #d97706">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">020150.KS</span>
-                                        <span class="chain-company-name">Lotte Energy Materials</span>
-                                    </div>
-                                    <div class="chain-company-products">韩国铜箔冠军，业内首家量产 HVLP4 给 AI 加速器</div>
-                                </div>
+                                <div class="chain-company-products">韩国铜箔冠军，业内首家量产 HVLP4 给 AI 加速器</div>
                             </div>
                         </div>
-
-                    <div class="chain-arrow">
-                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="11" y1="4" x2="11" y2="24"/>
-                            <polyline points="5,18 11,24 17,18"/>
-                        </svg>
                     </div>
 
-                        <!-- Stage 2: CCL -->
-                        <div class="chain-stage" style="--stage-color: #10b981">
-                            <div class="chain-stage-header">
-                                <div class="chain-stage-icon">●</div>
-                                <div class="chain-stage-title">CCL · 覆铜板</div>
-                                <div class="chain-stage-subtitle">高速 / 低损耗层压板</div>
-                            </div>
-                            <div class="chain-companies cols-2">
-                                <div class="chain-company" style="--company-color: #0891b2">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">2383.TW</span>
-                                        <span class="chain-company-name">EMC 联茂电子</span>
-                                    </div>
-                                    <div class="chain-company-products">高速 / 低损耗 CCL，AI 服务器 M6/M7 主供之一</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #16a34a">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">600183.SS</span>
-                                        <span class="chain-company-name">生益科技 Shengyi</span>
-                                    </div>
-                                    <div class="chain-company-products">M6/M7/M8 高速 CCL，国内 mass-lam 龙头</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #14b8a6">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">6274.TW</span>
-                                        <span class="chain-company-name">TUC 台燿科技</span>
-                                    </div>
-                                    <div class="chain-company-products">ThunderClad 系列高速 CCL，AI 服务器三强之一</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #22c55e">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">6213.TW</span>
-                                        <span class="chain-company-name">ITEQ 台光电</span>
-                                    </div>
-                                    <div class="chain-company-products">台湾高速 CCL 纯玩家，AI 服务器实质份额</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    <div class="chain-arrow">
-                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="11" y1="4" x2="11" y2="24"/>
-                            <polyline points="5,18 11,24 17,18"/>
-                        </svg>
+                    <!-- Y 字分叉：铜箔分流为载板路径（左）与 PCB 路径（右） -->
+                    <div class="chain-arrow-split" aria-hidden="true">
+                        <span class="trunk"></span>
+                        <span class="bridge"></span>
+                        <span class="branch left"></span>
+                        <span class="branch right"></span>
                     </div>
 
-                        <!-- Stage 3: IC Substrate -->
-                        <div class="chain-stage" style="--stage-color: #00d4ff">
-                            <div class="chain-stage-header">
-                                <div class="chain-stage-icon">■</div>
-                                <div class="chain-stage-title">IC 载板 · Substrate</div>
-                                <div class="chain-stage-subtitle">FC-BGA / BT 封装载板</div>
-                            </div>
-                            <div class="chain-companies cols-3">
-                                <div class="chain-company" style="--company-color: #2563eb">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">3037.TW</span>
-                                        <span class="chain-company-name">Unimicron 欣兴</span>
-                                    </div>
-                                    <div class="chain-company-products">全球前三 FC-BGA 载板，AI / HPC 放量主线</div>
+                    <!-- 两条平行路径 -->
+                    <div class="chain-branch">
+
+                        <!-- 左路径：ABF / 载板材料 → IC 载板 -->
+                        <div class="chain-branch-column">
+
+                            <!-- Stage 2L: ABF / 载板材料 -->
+                            <div class="chain-stage" style="--stage-color: #ec4899">
+                                <div class="chain-stage-header">
+                                    <div class="chain-stage-icon">◇</div>
+                                    <div class="chain-stage-title">ABF / 载板材料</div>
+                                    <div class="chain-stage-subtitle">ABF 膜 & BT 树脂 · 载板介电材料</div>
                                 </div>
-                                <div class="chain-company" style="--company-color: #6366f1">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">4062.T</span>
-                                        <span class="chain-company-name">Ibiden 揖斐电</span>
+                                <div class="chain-companies cols-2">
+                                    <div class="chain-company" style="--company-color: #db2777">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">2802.T</span>
+                                            <span class="chain-company-name">Ajinomoto 味之素</span>
+                                        </div>
+                                        <div class="chain-company-products">ABF 堆积膜 — 全球 >95% 份额，FC-BGA 堆积层垄断介电材料（NVIDIA / AMD AI 封装必用）</div>
                                     </div>
-                                    <div class="chain-company-products">高端 FC-BGA 龙头，NVIDIA 核心载板供应商</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #7c3aed">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">3189.TW</span>
-                                        <span class="chain-company-name">Kinsus 景硕</span>
+                                    <div class="chain-company" style="--company-color: #be185d">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">4182.T</span>
+                                            <span class="chain-company-name">Mitsubishi Gas Chemical 三菱瓦斯化学</span>
+                                        </div>
+                                        <div class="chain-company-products">BT 树脂（双马来酰亚胺三嗪）— 存储 / 手机 SoC 封装载板的主导介电材料</div>
                                     </div>
-                                    <div class="chain-company-products">FC-BGA 与 BT 载板，中端 AI 产能提供者</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #1d4ed8">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">009150.KS</span>
-                                        <span class="chain-company-name">Samsung Electro-Mechanics</span>
-                                    </div>
-                                    <div class="chain-company-products">韩国主要 FC-BGA 载板厂，向 NVIDIA AI 载板放量</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #4f46e5">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">8046.TW</span>
-                                        <span class="chain-company-name">Nan Ya PCB 南电</span>
-                                    </div>
-                                    <div class="chain-company-products">台湾载板三雄之一，高端 FC-BGA 重要玩家</div>
                                 </div>
                             </div>
+
+                            <div class="chain-arrow">
+                                <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="11" y1="4" x2="11" y2="24"/>
+                                    <polyline points="5,18 11,24 17,18"/>
+                                </svg>
+                            </div>
+
+                            <!-- Stage 3L: IC 载板 -->
+                            <div class="chain-stage" style="--stage-color: #00d4ff">
+                                <div class="chain-stage-header">
+                                    <div class="chain-stage-icon">■</div>
+                                    <div class="chain-stage-title">IC 载板 · Substrate</div>
+                                    <div class="chain-stage-subtitle">FC-BGA / BT 封装载板</div>
+                                </div>
+                                <div class="chain-companies cols-2">
+                                    <div class="chain-company" style="--company-color: #2563eb">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">3037.TW</span>
+                                            <span class="chain-company-name">Unimicron 欣兴</span>
+                                        </div>
+                                        <div class="chain-company-products">全球前三 FC-BGA 载板，AI / HPC 放量主线</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #6366f1">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">4062.T</span>
+                                            <span class="chain-company-name">Ibiden 揖斐电</span>
+                                        </div>
+                                        <div class="chain-company-products">高端 FC-BGA 龙头，NVIDIA 核心载板供应商</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #7c3aed">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">3189.TW</span>
+                                            <span class="chain-company-name">Kinsus 景硕</span>
+                                        </div>
+                                        <div class="chain-company-products">FC-BGA 与 BT 载板，中端 AI 产能提供者</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #1d4ed8">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">009150.KS</span>
+                                            <span class="chain-company-name">Samsung Electro-Mechanics</span>
+                                        </div>
+                                        <div class="chain-company-products">韩国主要 FC-BGA 载板厂，向 NVIDIA AI 载板放量</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #4f46e5">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">8046.TW</span>
+                                            <span class="chain-company-name">Nan Ya PCB 南电</span>
+                                        </div>
+                                        <div class="chain-company-products">台湾载板三雄之一，高端 FC-BGA 重要玩家</div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
-                    <div class="chain-arrow">
-                        <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="11" y1="4" x2="11" y2="24"/>
-                            <polyline points="5,18 11,24 17,18"/>
-                        </svg>
+                        <!-- 右路径：CCL → PCB 主板 -->
+                        <div class="chain-branch-column">
+
+                            <!-- Stage 2R: CCL -->
+                            <div class="chain-stage" style="--stage-color: #10b981">
+                                <div class="chain-stage-header">
+                                    <div class="chain-stage-icon">●</div>
+                                    <div class="chain-stage-title">CCL · 覆铜板</div>
+                                    <div class="chain-stage-subtitle">高速 / 低损耗层压板</div>
+                                </div>
+                                <div class="chain-companies cols-2">
+                                    <div class="chain-company" style="--company-color: #0891b2">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">2383.TW</span>
+                                            <span class="chain-company-name">EMC 联茂电子</span>
+                                        </div>
+                                        <div class="chain-company-products">高速 / 低损耗 CCL，AI 服务器 M6/M7 主供之一</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #16a34a">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">600183.SS</span>
+                                            <span class="chain-company-name">生益科技 Shengyi</span>
+                                        </div>
+                                        <div class="chain-company-products">M6/M7/M8 高速 CCL，国内 mass-lam 龙头</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #14b8a6">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">6274.TW</span>
+                                            <span class="chain-company-name">TUC 台燿科技</span>
+                                        </div>
+                                        <div class="chain-company-products">ThunderClad 系列高速 CCL，AI 服务器三强之一</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #22c55e">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">6213.TW</span>
+                                            <span class="chain-company-name">ITEQ 台光电</span>
+                                        </div>
+                                        <div class="chain-company-products">台湾高速 CCL 纯玩家，AI 服务器实质份额</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chain-arrow">
+                                <svg viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="11" y1="4" x2="11" y2="24"/>
+                                    <polyline points="5,18 11,24 17,18"/>
+                                </svg>
+                            </div>
+
+                            <!-- Stage 3R: PCB 主板 -->
+                            <div class="chain-stage" style="--stage-color: #f59e0b">
+                                <div class="chain-stage-header">
+                                    <div class="chain-stage-icon">▲</div>
+                                    <div class="chain-stage-title">PCB · 主板</div>
+                                    <div class="chain-stage-subtitle">服务器 / GPU 主板</div>
+                                </div>
+                                <div class="chain-companies cols-2">
+                                    <div class="chain-company" style="--company-color: #ea580c">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">300476.SZ</span>
+                                            <span class="chain-company-name">胜宏科技 Shenghong</span>
+                                        </div>
+                                        <div class="chain-company-products">高层数 PCB，NVIDIA GPU 板卡核心供应商</div>
+                                    </div>
+                                    <div class="chain-company" style="--company-color: #b91c1c">
+                                        <div class="chain-company-header">
+                                            <span class="chain-company-ticker">002463.SZ</span>
+                                            <span class="chain-company-name">沪电股份 WUS Printed Circuit</span>
+                                        </div>
+                                        <div class="chain-company-products">A 股 AI 服务器 PCB 核心，HPC 业务高速增长</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
                     </div>
-
-                        <!-- Stage 4: PCB -->
-                        <div class="chain-stage" style="--stage-color: #f59e0b">
-                            <div class="chain-stage-header">
-                                <div class="chain-stage-icon">▲</div>
-                                <div class="chain-stage-title">PCB · 主板</div>
-                                <div class="chain-stage-subtitle">服务器 / GPU 主板</div>
-                            </div>
-                            <div class="chain-companies cols-2">
-                                <div class="chain-company" style="--company-color: #ea580c">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">300476.SZ</span>
-                                        <span class="chain-company-name">胜宏科技 Shenghong</span>
-                                    </div>
-                                    <div class="chain-company-products">高层数 PCB，NVIDIA GPU 板卡核心供应商</div>
-                                </div>
-                                <div class="chain-company" style="--company-color: #b91c1c">
-                                    <div class="chain-company-header">
-                                        <span class="chain-company-ticker">002463.SZ</span>
-                                        <span class="chain-company-name">沪电股份 WUS Printed Circuit</span>
-                                    </div>
-                                    <div class="chain-company-products">A 股 AI 服务器 PCB 核心，HPC 业务高速增长</div>
-                                </div>
-                            </div>
-                        </div>
 
                 </div>
             </div>
